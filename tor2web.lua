@@ -1,7 +1,7 @@
 local socks5 = require 'socks5'
 local ngx = require 'ngx'
 
-local onion2web = {}
+local tor2web = {}
 
 local hidden_base = "(" .. string.rep("%w", 16) .. ")"
 local hidden_onion = hidden_base .. '%.onion'
@@ -11,7 +11,7 @@ local show_confirmation_form = function()
     local onion = host:match(hidden_base) .. '.onion'
     if ngx.req.get_method() == 'POST' and
             ngx.var.uri:match('^/confirm') then
-        ngx.header['Set-Cookie'] = 'onion2web_confirmed=true;'
+        ngx.header['Set-Cookie'] = 'tor2web_confirmed=true;'
         return ngx.redirect("/")
     end
     ngx.say(([[<html>
@@ -58,7 +58,7 @@ that you have understood:
 </form>
 </center>
 
-<a href="https://github.com/starius/onion2web">
+<a href="https://github.com/starius/tor2web">
 <img style="position: absolute; top: 0; right: 0; border: 0;"
 src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
 alt="Fork me on GitHub"
@@ -69,7 +69,7 @@ alt="Fork me on GitHub"
 ]]):format(host, onion, onion))
 end
 
-onion2web.handle_onion2web = function(onion_replacement,
+tor2web.handle_tor2web = function(onion_replacement,
         torhost, torport, confirmation)
     if not torhost then
         torhost = '127.0.0.1'
@@ -89,7 +89,7 @@ onion2web.handle_onion2web = function(onion_replacement,
     local cookies = ngx.req.get_headers()['Cookie']
     if confirmation and
             (not cookies or
-            not cookies:match('onion2web_confirmed=true')) then
+            not cookies:match('tor2web_confirmed=true')) then
         show_confirmation_form()
         return
     end
@@ -107,5 +107,5 @@ onion2web.handle_onion2web = function(onion_replacement,
     end)
 end
 
-return onion2web
+return tor2web
 
